@@ -179,4 +179,4 @@ async def tclear(ctx, amount=3):
     await ctx.channel.send(f'The {amount} message(s) have been removed.')
 # <----- Clear Command End ----->
 client.remove_command('help')
-client.run('NzQ1ODUyMDgyMTQ5MzkyMzk3.Xz3y4Q.5aXJblAQ7YX2V8tYZTDzBpPDVmI')    
+client.run('')    
