@@ -5,7 +5,6 @@ from discord.utils import get
 import random
 from random import choice
 import youtube_dl
-import spotify_dl
 import time
 import functools
 import itertools
@@ -18,8 +17,6 @@ from discord.ext import commands
 
 from discord.voice_client import VoiceClient
 import os
-import configparser
-from shutil import copy
 from sys import platform, exit as shutdown
 
 directory = os.path.dirname(os.path.realpath(__file__))
@@ -41,17 +38,18 @@ async def on_ready():
     client.add_cog(Music(client))
     client.add_cog(aroles(client))
     client.add_cog(rroles(client))
-    # client.add_cog(Poll(client))
     client.add_cog(Welcome(client))
     client.add_cog(Leave(client))
     client.add_cog(AmongUsQueue(client))
     client.add_cog(Helps(client))
     client.add_cog(RocketLeagueQueue(client))
+    client.add_cog(Channel_Changes(client))
+    client.add_cog(DiscordStreaming(client))
 
 @client.event
 async def on_command_error(ctx, error):
     await ctx.send(error)
-    raise error
+    print(f'{time.strftime(("[%d/%m/%Y, %I:%M:%S %p ET]"))}', error)
 
 ## _____________________________ CODE STARTS HERE _______________________________ ##
 
@@ -79,7 +77,7 @@ async def ping_mention(ctx):
 
 @client.command()
 async def poll(ctx, channel : discord.TextChannel, *, question):  
-    if channel is client.get_channel(id=795863641378521088):
+    if channel is client.get_channel(name="poll-chat"):
         if commands.has_permissions(manage_messages=True):
             await ctx.channel.purge(limit=1)
             embed = discord.Embed(
@@ -92,7 +90,7 @@ async def poll(ctx, channel : discord.TextChannel, *, question):
         elif commands.has_permissions(manage_messages=False):
             await ctx.channel.purge(limit=1)
             await ctx.send("You don't have Perms")
-    elif channel is not client.get_channel(id=795863641378521088):
+    elif channel is not client.get_channel(name="poll-chat"):
         await ctx.send(f'sorry, Try when you get Mod or higher. if you are a mod, then make the channel #poll-chat.\n{ctx.message.author.mention}')
 
 
@@ -126,7 +124,6 @@ async def role_check(ctx, *, role: discord.Role, member : discord.Member = None)
     embed = discord.Embed(
         colour=discord.Colour.darker_grey(), timestamp=ctx.message.created_at,
                           title=f"User Info - {member}")
-    embed.set_thumbnail(url=member.avatar_url)
     embed.set_footer(text=f"Requested by {ctx.author}")
 
     embed.add_field(name="Role:", value=f'{role}')
@@ -174,14 +171,6 @@ async def ban(ctx, user: discord.Member, *, reason=None):
     await ctx.send(f"{user} has been banned sucessfully")
     print(f'BOT is still running after the Ban. The Banned user is {user}')
 # <----- ban commmand end ------>
-@client.command()
-async def lock(ctx, channel : discord.TextChannel):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await channel.send("Locked!")
-@client.command()
-async def unlock(ctx, channel : discord.TextChannel):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-    await channel.send("Un-Locked!")
 #clear command
 @client.command()
 @commands.has_permissions(administrator=True)

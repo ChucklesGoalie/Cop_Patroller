@@ -12,8 +12,8 @@ class Welcome(commands.Cog):
     
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        server = self.bot.get_server(id)
-        channel = self.bot.get_channel(id)
+        server = discord.utils.get(member.guild)
+        channel = self.bot.get_channel(name="Welcome")
         await channel.send(f"Welcome {member.mention}! Enjoy your stay at {server}")
 
 class Leave(commands.Cog):
@@ -22,6 +22,6 @@ class Leave(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_leave(self, member):
-        server = self.bot.get_server(id)
-        channel = self.bot.get_channel(id)
+        server = discord.utils.get(member.guild)
+        channel = self.bot.get_channel(name="Welcome")
         await channel.send(f"Goodbye {member}! I hope you enjoyed your stay at {server}")

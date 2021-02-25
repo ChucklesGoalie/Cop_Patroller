@@ -47,6 +47,12 @@ class aroles(commands.Cog):
         await user.add_roles(GTArole)
         await ctx.send(f"{user} now has {GTArole}")
 
+    @commands.command()
+    async def aroleStreamer(self, ctx, user : discord.Member):
+        Streamer = discord.utils.get(user.guild.roles, name="Streamer")
+        await user.add_roles(Streamer)
+        await ctx.send(f"{user} now has {Streamer}")      
+
 class rroles(commands.Cog):
 
     def __init__(self, bot):
@@ -88,3 +94,9 @@ class rroles(commands.Cog):
         GTArole = discord.utils.get(user.guild.roles, name="GTA Player")
         await user.remove_roles(GTArole)
         await ctx.send(f"{GTArole} has been removed from {user}")
+
+    @commands.command()
+    async def rroleStreamer(self, ctx, user : discord.Member):
+        Streamer = discord.utils.get(user.guild.roles, name="Streamer")
+        await user.remove_roles(Streamer)
+        await ctx.send(f"{Streamer} has been removed from {user}")
