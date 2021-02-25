@@ -48,8 +48,9 @@ async def on_ready():
 
 @client.event
 async def on_command_error(ctx, error):
+    user = ctx.message.author
     await ctx.send(error)
-    print(f'{time.strftime(("[%d/%m/%Y, %I:%M:%S %p ET]"))}', error)
+    print(f'[{user.guild}]', f'{time.strftime(("[%d/%m/%Y, %I:%M:%S %p ET]"))}', error)
 
 ## _____________________________ CODE STARTS HERE _______________________________ ##
 
