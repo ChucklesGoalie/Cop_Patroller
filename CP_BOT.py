@@ -10,10 +10,9 @@ import functools
 import itertools
 import math
 import ffmpeg
-from cogs import *
+from cogs import RankCheck, TheMusique, Music, aroles, rroles, Welcome, Leave, AmongUsQueue, Helps, RocketLeagueQueue, Channel_Changes, DiscordStreaming, ModCommands
 
 from async_timeout import timeout
-from discord.ext import commands
 
 from discord.voice_client import VoiceClient
 import os
@@ -35,7 +34,7 @@ asyncio.run(main())
 async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Cop Patrolling this area'))
     print('The Cop Patroller Bot is running!')
-    client.add_cog(Music(client))
+    # client.add_cog(Music(client))
     client.add_cog(aroles(client))
     client.add_cog(rroles(client))
     client.add_cog(Welcome(client))
@@ -45,12 +44,48 @@ async def on_ready():
     client.add_cog(RocketLeagueQueue(client))
     client.add_cog(Channel_Changes(client))
     client.add_cog(DiscordStreaming(client))
+    client.add_cog(ModCommands(client))
+    client.add_cog(TheMusique(client))
+    # client.add_cog(RankCheck(client))
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def load(ctx, Cog):
+    client.load_extension(Cog)
+    ctx.send("cog loaded")
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def unload(ctx, Cog):
+    client.unload_extension(Cog)
+    ctx.send("Cog Unloaded")
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def reload(ctx, Cog):
+    client.unload_extension(Cog)
+    client.load_extension(Cog)
 
 @client.event
 async def on_command_error(ctx, error):
     user = ctx.message.author
     await ctx.send(error)
     print(f'[{user.guild}]', f'{time.strftime(("[%d/%m/%Y, %I:%M:%S %p ET]"))}', error)
+
+# async def save_audit_logs(ctx, guild :discord.Guild, user : discord.Member):
+#     with open(f'audit_logs_{guild.name}.txt', 'w+') as f:
+#         async for entry in guild.audit_logs(limit=100):
+#             f.write('{0.user} did {0.action} to {0.target}'.format(entry))
+
+# @client.event
+# async def on_message(message):
+#     if message.content.startswith('audit'):
+#         await save_audit_logs(message.channel.guild)    
+
+# @client.command()
+# @commands.has_permissions(view_audit_log=True)
+# async def get_audit_logs(ctx):
+#     await ctx.send(save_audit_logs)
 
 ## _____________________________ CODE STARTS HERE _______________________________ ##
 
@@ -127,57 +162,11 @@ async def role_check(ctx, *, role: discord.Role, member : discord.Member = None)
                           title=f"User Info - {member}")
     embed.set_footer(text=f"Requested by {ctx.author}")
 
-    embed.add_field(name="Role:", value=f'{role}')
-    embed.add_field(name="Members:", value=f'{members}')
+    embed.add_field(name="Role:", value=f'{role}', inline=True)
+    embed.add_field(name="Members:", value=f'{members}', inline=True)
 
     await ctx.send(embed=embed)
 
-#mute command using discord.py
-@client.command()
-@commands.has_permissions(administrator=True)
-async def mute(ctx, user: discord.Member, *, reason=None):
-    if commands.has_permissions(administrator=True):
-        muterole=discord.utils.get(user.guild.roles, name="Muted")
-        channel = await user.create_dm()
-        await user.add_roles(muterole)
-        await ctx.send(f"**{user.mention}** has been muted")
-        await channel.send(f"You've been muted because: {reason}")
-## <----- Mute command end ----->
-## unmute command using discord.py
-@client.command()
-@commands.has_permissions(administrator=True)
-async def unmute(ctx, user: discord.Member, *, reason=None):
-    if commands.has_permissions(mute_members=True):
-        muterole=discord.utils.get(user.guild.roles, name="Muted")
-        await user.remove_roles(muterole)
-        await ctx.send(f"**{user.mention}** has been unmuted")
-## <----- unmute command end ----->
-#kick command using discord.py
-@client.command()
-@commands.has_permissions(kick_members=True)
-async def kick(ctx, user: discord.Member, *, reason=None):
-    channel = await user.create_dm()
-    await user.kick(reason=reason)
-    await channel.send(f"You've been kicked because: {reason}")
-    await ctx.send(f"{user} has been kicked sucessfully")
-    print(f'BOT is still running after the Kick. The Kicked User is {user}')
-# <----- kick commmand end ------>
-#ban Command using discord.py
-@client.command()
-@commands.has_permissions(ban_members=True)
-async def ban(ctx, user: discord.Member, *, reason=None):
-    channel = await user.create_dm()
-    await user.ban(reason=reason)
-    await channel.send(f"You've been banned because: {reason}")
-    await ctx.send(f"{user} has been banned sucessfully")
-    print(f'BOT is still running after the Ban. The Banned user is {user}')
-# <----- ban commmand end ------>
-#clear command
-@client.command()
-@commands.has_permissions(administrator=True)
-async def tclear(ctx, amount=3):
-    await ctx.channel.purge(limit=amount)
-    await ctx.channel.send(f'The {amount} message(s) have been removed.')
-# <----- Clear Command End ----->
+
 client.remove_command('help')
 client.run('')    

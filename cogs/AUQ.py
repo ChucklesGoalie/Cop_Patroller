@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import json
 
 class AmongUsQueue(commands.Cog):
 
@@ -19,7 +20,7 @@ class AmongUsQueue(commands.Cog):
     #     await ctx.send("The queue has filled, Please hop in a voice channel and play Among us!\n", embed=embed)
 
     @commands.command(pass_context=True)
-    async def AUQadd(self, ctx):
+    async def AUQ(self, ctx):
         ''' Add yourself to the queue!'''
         author = ctx.message.author
         if self.qtoggle == False:
@@ -51,6 +52,27 @@ class AmongUsQueue(commands.Cog):
             self.AUQqueue = []
             self.Queue_Size = 0
 
+
+    @commands.command(aliases=["AUFQA"])
+    @commands.has_guild_permissions(administrator=True)
+    async def AUQ_force_queue_add(self, ctx, *, user : discord.Member):
+        if user.mention not in self.AUQqueue:
+            self.Queue_Size = self.Queue_Size + 1
+            await ctx.send('you have been added to the queue.')
+
+            if self.Queue_Size > self.Max_Queue_Size:
+               self.Queue_Size = self.Queue_Size - 1
+               return
+            else:
+                self.AUQqueue.append(user.mention)
+                embed = discord.Embed(
+                colour = discord.Colour.red())
+            # embed.add_field(name=' ', value=' ', inline=False)
+                embed.add_field(name='Among Us Queue: ', value=f'{self.AUQqueue}', inline=False)
+                await ctx.send(embed=embed)
+        else:
+            await ctx.send('They are already in the queue!')
+
     @commands.command(name='AUQLeave', pass_context=True)
     async def AUQremove(self, ctx):
         ''' Remove yourself from the queue'''
@@ -73,15 +95,6 @@ class AmongUsQueue(commands.Cog):
         else:
             await ctx.send('you were not in the queue.')
         ctx.send(embed=embed)
-    @commands.command(name='AUQ', pass_context=True)
-    async def _AUQqueue(self, ctx):
-        ''' See who's up next!'''
-        embed = discord.Embed(
-            colour = discord.Colour.red())
-         # embed.add_field(name=' ', value=' ', inline=False)
-        embed.add_field(name='Among Us Queue: ', value=f'{self.AUQqueue}', inline=False)
-        message = embed
-        await ctx.send(embed=message)
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
@@ -108,3 +121,16 @@ class AmongUsQueue(commands.Cog):
     @commands.command()
     async def AUQPing(self, ctx):
         await ctx.send(f"{self.AUQqueue}, You have been summonned. If this is a queue start then you have {self.Queue_Size}. Start if people say so@.")
+
+    @commands.command()
+    async def save_current_AUQ(self, ctx):
+        self.save_AUQQueue
+        with open("E:\Discord Bot\Python\Cop_Patroller BOT\AUQqueue.json", "rb") as file:
+            await ctx.send(f"{self.AUQqueue}", file=discord.File(file, "AUQqueue.json"))
+
+    async def save_AUQQueue(self):
+    # write to file
+        with open("E:\Discord Bot\Python\Cop_Patroller BOT\AUQqueue.json", "w") as file:
+            file.write(f'{self.AUQqueue}')
+
+

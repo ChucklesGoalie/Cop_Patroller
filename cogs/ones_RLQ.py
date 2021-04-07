@@ -7,31 +7,21 @@ import functools
 import itertools
 import math
 
-class RocketLeagueQueue(commands.Cog):
-
+class RocketLeagueQueueOnes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.RLQqueue = []
-        self.Queue_Size = 0
-        self.Max_Queue_Size = 6
+        self.OnesRLQqueue = []
+        self.Ones_Queue_Size = 0
+        self.Ones_Max_Queue_Size = 2
         self.qtoggle = True
-
-    # def create_queue(ctx, queue):
-    #     squeue = ''.join(str(e) for e in queue)
-    #     embed = discord.Embed(
-    #     colour = discord.Colour.red())
-    # # embed.add_field(name=' ', value=' ', inline=False)
-    #     embed.add_field(name='Among Us Queue: ', value=f'{squeue}', inline=False)
-    #     await ctx.send("The queue has filled, Please hop in a voice channel and play Among us!\n", embed=embed)
 
     @commands.command(pass_context=True)
     async def RLQ(self, ctx):
         ''' Add yourself to the queue!'''
         author = ctx.message.author
-        server = ctx.message.server
         if self.qtoggle == False:
             return
-    
+
         if author.mention not in self.RLQqueue:
             self.Queue_Size = self.Queue_Size + 1
             await ctx.send('you have been added to the queue.')
@@ -40,11 +30,11 @@ class RocketLeagueQueue(commands.Cog):
                self.Queue_Size = self.Queue_Size - 1
                return
             else:
-                self.RLQqueue[server.id].append(author.mention)
+                self.RLQqueue.append(author.mention)
                 embed = discord.Embed(
                 colour = discord.Colour.red())
             # embed.add_field(name=' ', value=' ', inline=False)
-                embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
+                embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
                 await ctx.send(embed=embed)
         else:
             await ctx.send('you are already in the queue!')
@@ -53,10 +43,10 @@ class RocketLeagueQueue(commands.Cog):
             embed = discord.Embed(
             colour = discord.Colour.red())
         # embed.add_field(name=' ', value=' ', inline=False)
-            embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
-            await ctx.send(f"{self.RLQqueue}")
-            self.RLQqueue = []
-            self.Queue_Size = 0
+            embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
+            await ctx.send(f"{self.OnesRLQqueue}")
+            self.OnesRLQqueue = []
+            self.Ones_Queue_Size = 0
             self.room_name = self._generate_name_pass()
             self.room_pass = self._generate_name_pass()
             await ctx.send(f"The queue has filled, Please hop in a voice channel and play Rocket League! Please look at new channel for info")
@@ -70,11 +60,11 @@ class RocketLeagueQueue(commands.Cog):
         if author.mention in self.RLQqueue:
             self.RLQqueue.remove(author.mention)
             await ctx.send(f'you have been removed from the queue.\n')
-            self.Queue_Size = self.Queue_Size - 1
+            self.Ones_Queue_Size = self.Ones_Queue_Size - 1
             embed = discord.Embed(
                 colour = discord.Colour.red())
             # embed.add_field(name=' ', value=' ', inline=False)
-            embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
+            embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send('you were not in the queue.')
@@ -86,7 +76,7 @@ class RocketLeagueQueue(commands.Cog):
         embed = discord.Embed(
             colour = discord.Colour.red())
          # embed.add_field(name=' ', value=' ', inline=False)
-        embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
+        embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
         message = embed
         await ctx.send(embed=message)
 
@@ -94,20 +84,20 @@ class RocketLeagueQueue(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def RLQclear(self, ctx):
         ''' Clears the queue'''
-        self.RLQqueue = []
-        self.Queue_Size = 0
+        self.OnesRLQqueue = []
+        self.Ones_Queue_Size = 0
         await ctx.send('Queue has been cleared')
 
     @commands.command(aliases=["RL_CQS", "RL_QS"])
     async def Check_Queue_Size_RL(self, ctx):
-        await ctx.send(f"Queue size is {self.Queue_Size}\nMax Queue size is {self.Max_Queue_Size}")
+        await ctx.send(f"Queue size is {self.Ones_Queue_Size}\nMax Queue size is {self.Ones_Max_Queue_Size}")
 
     @commands.command()
     async def RLQStart(self, ctx):
         embed = discord.Embed(
             colour = discord.Colour.red())
     # embed.add_field(name=' ', value=' ', inline=False)
-        embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
+        embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
         self.room_name = self._generate_name_pass()
         self.room_pass = self._generate_name_pass()
         await ctx.send(f"||{self.OnesRLQqueue}|| \nThe queue has filled, Please hop in a voice channel and play Rocket League! Please look at new channel for info")
@@ -116,7 +106,7 @@ class RocketLeagueQueue(commands.Cog):
 
     @commands.command()
     async def RLQPing(self, ctx):
-        await ctx.send(f"{self.RLQqueue}, You have been summonned. If this is a queue start then you have {self.Queue_Size}. Start if people say so@.")
+        await ctx.send(f"{self.OnesRLQqueue}, You have been summonned. If this is a queue start then you have {self.Queue_Size}. Start if people say so@.")
 
 
 
@@ -125,15 +115,15 @@ class RocketLeagueQueue(commands.Cog):
         category = discord.utils.get(ctx.guild.categories, name="Rocket League")
         channel = discord.TextChannel
         voice_channel = discord.VoiceChannel
-        await ctx.user.guild.channel.delete(name=f"6Mans", category=category)
+        await ctx.user.guild.channel.delete(name=f"2Mans", category=category)
         await ctx.user.guild.voice_channel.delete(name="Blue Team", category=category)
         await ctx.user.guild.voice_channel.delete(name="Orange Team", category=category)
 
 
     async def create_channels(self, ctx):
         category = discord.utils.get(ctx.guild.categories, name="Rocket League")
-        text_channel = discord.utils.get(discord.Member.guild.channel, name="6Mans")
-        await ctx.guild.create_text_channel(f"6Mans", category=category)
+        text_channel = discord.utils.get(discord.Member.guild.channel, name="2Mans")
+        await ctx.guild.create_text_channel(f"2Mans", category=category)
         await ctx.guild.create_voice_channel(f"Blue Team",category=category)
         await ctx.guild.create_voice_channel(f"Orange Team",category=category)
         time.sleep(5) #sleep for 5 seconds
@@ -141,9 +131,9 @@ class RocketLeagueQueue(commands.Cog):
         embed = discord.Embed (
             colour = discord.Colour.red())
          # embed.add_field(name=' ', value=' ', inline=False)
-        embed.add_field(name='Rocket League Queue: ', value=f'{self.RLQqueue}', inline=False)
+        embed.add_field(name='Rocket League Queue: ', value=f'{self.OnesRLQqueue}', inline=False)
         embed = embed
-        await ctx.send in text_channel(f"{self.RLQqueue} ", embed=embed)
+        await ctx.send in text_channel(f"{self.OnesRLQqueue} ", embed=embed)
         await ctx.send in text_channel(f"```Lobby info\nUsername: {self.room_pass}\nPassword: {self.room_pass}```\nPlease create the game and join voice chats, When done please do .end_game command and it will delete the channels. Have fun and make teams!")
 
     @commands.command(pass_context=True)
@@ -166,10 +156,8 @@ class RocketLeagueQueue(commands.Cog):
     def _generate_name_pass(self):
         return room_pass[random.randrange(len(room_pass))]
 
-    def teams(self, user : discord.Member):
+    def teams(self):
         return teams[random.randrage(len(self.RLQqueue))]
-
-
 
 room_pass = [
     'octane', 'takumi', 'dominus', 'hotshot', 'batmobile', 'mantis',
